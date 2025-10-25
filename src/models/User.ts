@@ -11,10 +11,10 @@ export class UserModel {
   static async create(walletAddress: string, username?: string): Promise<User> {
     const { data, error } = await supabase
       .from('users')
-      .insert([{ wallet_address: walletAddress, username }])
-      .select()
+      .insert({ wallet_address: walletAddress, username })
+      .select("*")
       .single();
-
+    
     if (error) throw error;
     return data;
   }
