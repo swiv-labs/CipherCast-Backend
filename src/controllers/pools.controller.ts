@@ -152,7 +152,7 @@ export class PoolsController {
 
       // Close on blockchain
       try {
-        const poolId = parseInt(pool.id);
+        const poolId = parseInt(pool.poolid.toString());
         await cyphercastClient.closePool(poolId);
         console.log(`Pool ${poolId} closed on-chain`);
       } catch (error: any) {
@@ -184,12 +184,10 @@ export class PoolsController {
         throw new AppError('Pool already finalized', 400);
       }
 
-      // Check if end time has passed
       if (new Date(pool.end_time) > new Date()) {
         throw new AppError('Pool end time has not been reached yet', 400);
       }
 
-      // Finalize through service (handles oracle + blockchain + db)
       await PoolFinalizationService.finalizePool(id);
 
       const updatedPool = await PoolModel.findById(id);
