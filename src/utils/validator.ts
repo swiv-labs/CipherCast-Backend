@@ -14,9 +14,25 @@ export const validateRequest = (schema: Joi.ObjectSchema) => {
 };
 
 // Validation Schemas
+
+// User Registration Schema (Updated for Privy)
 export const userRegisterSchema = Joi.object({
   walletAddress: Joi.string().required(),
+  authMethod: Joi.string()
+    .valid('email', 'wallet', 'google', 'apple', 'twitter', 'discord', 'github')
+    .required(),
+  authIdentifier: Joi.string().required(),
+  privyUserId: Joi.string().optional(),
   username: Joi.string().optional().allow(''),
+  email: Joi.string().email().optional().allow(''),
+  avatarUrl: Joi.string().uri().optional().allow(''),
+  isEmailVerified: Joi.boolean().optional(),
+});
+
+// User Login Schema
+export const userLoginSchema = Joi.object({
+  walletAddress: Joi.string().required(),
+  privyUserId: Joi.string().optional(),
 });
 
 export const createPoolSchema = Joi.object({
