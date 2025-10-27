@@ -10,7 +10,7 @@ export class PoolFinalizationService {
    */
   static async finalizePool(poolId: string): Promise<void> {
     try {
-      const pool = await PoolModel.findById(poolId);
+      const pool = await PoolModel.findByPoolId(poolId);
       if (!pool) throw new Error('Pool not found');
       if (pool.status === 'closed') throw new Error('Pool already closed');
 
@@ -37,12 +37,12 @@ export class PoolFinalizationService {
       }
 
       // 3. Update pool status in database
-      await PoolModel.close(poolId, finalPrice);
+      await PoolModel.close(pool.id, finalPrice);
 
       // 4. Calculate winners and update predictions
-      await this.settlePredictions(poolId, finalPrice, pool.target_price);
+      await this.settlePredictions(pool.id, finalPrice, pool.target_price);
 
-      console.log(`Pool ${poolId} finalized successfully`);
+      console.log(`Pool ${pool.id} finalized successfully`);
     } catch (error: any) {
       console.error(`Failed to finalize pool ${poolId}:`, error.message);
       throw error;

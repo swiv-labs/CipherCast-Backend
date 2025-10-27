@@ -46,7 +46,7 @@ export const createPredictionSchema = Joi.object({
   poolId: Joi.string().uuid().required(),
   userWallet: Joi.string().required(),
   predictedPrice: Joi.number().positive().required(),
-  direction: Joi.string().valid('up', 'down').required(),
+  // direction: Joi.string().valid('up', 'down').required(),
   amount: Joi.number().positive().required(),
 });
 

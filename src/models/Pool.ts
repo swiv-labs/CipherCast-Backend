@@ -53,6 +53,17 @@ export class PoolModel {
     return data;
   }
 
+  static async findByPoolId(id: string): Promise<Pool | null> {
+    const { data, error } = await supabase
+      .from('pools')
+      .select('*')
+      .eq('poolid', id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  }
+
   static async findAll(status?: string): Promise<Pool[]> {
     let query = supabase.from('pools').select('*').order('created_at', { ascending: false });
 

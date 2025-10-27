@@ -19,7 +19,7 @@ export const startPoolFinalizationJob = () => {
 
       for (const pool of expiredPools) {
         try {
-          await PoolFinalizationService.finalizePool(pool.id);
+          await PoolFinalizationService.finalizePool(pool.poolid.toString());
         } catch (error: any) {
           console.error(`Error finalizing pool ${pool.id}:`, error.message);
         }

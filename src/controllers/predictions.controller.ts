@@ -33,22 +33,9 @@ export class PredictionsController {
         pool_id: poolId,
         user_wallet: userWallet,
         predicted_price: predictedPrice,
-        direction,
+        // direction,
         amount,
       });
-
-      // Place prediction on blockchain
-      try {
-        await cyphercastClient.placePrediction({
-          poolId,
-          userWallet: new PublicKey(userWallet),
-          predictedPrice,
-          direction,
-          amount,
-        });
-      } catch (error: any) {
-        console.error('Blockchain prediction failed:', error.message);
-      }
 
       return successResponse(res, 'Prediction placed successfully', prediction, 201);
     } catch (error) {

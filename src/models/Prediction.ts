@@ -17,7 +17,7 @@ export class PredictionModel {
     pool_id: string;
     user_wallet: string;
     predicted_price: number;
-    direction: 'up' | 'down';
+    // direction: 'up' | 'down';
     amount: number;
   }): Promise<Prediction> {
     const { data, error } = await supabase
