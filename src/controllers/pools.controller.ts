@@ -9,7 +9,7 @@ import { env } from '../config/env';
 
 // Default token mint (should be configured in .env)
 const DEFAULT_TOKEN_MINT = new PublicKey(
-  env.TOKEN_MINT || 'So11111111111111111111111111111111111111112' // SOL mint as default
+  env.TOKEN_MINT! 
 );
 
 export class PoolsController {

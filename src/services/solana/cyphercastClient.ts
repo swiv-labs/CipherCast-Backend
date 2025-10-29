@@ -122,7 +122,7 @@ export class CypherCastClient {
         .rpc();
 
       console.log('Pool created on-chain:', tx);
-      
+
       return {
         signature: tx,
         poolPubkey: pool.toBase58(),
@@ -141,7 +141,7 @@ export class CypherCastClient {
     try {
       const [pool] = this.getPoolPDA(poolId);
       const poolData = await this.program.account.pool.fetch(pool);
-      
+
       return {
         poolId: poolData.poolId.toString(),
         admin: poolData.admin.toBase58(),
@@ -220,7 +220,7 @@ export class CypherCastClient {
     try {
       const [protocolState] = this.getProtocolStatePDA();
       const state = await this.program.account.protocolState.fetch(protocolState);
-      
+
       return {
         admin: state.admin.toBase58(),
         protocolFeeBps: state.protocolFeeBps,
@@ -231,6 +231,66 @@ export class CypherCastClient {
       console.error('Failed to fetch protocol state:', error);
       return null;
     }
+  }
+
+  /**
+   * Initialize process_bet computation definition (one-time setup)
+   */
+  async initProcessBetCompDef(): Promise<string> {
+    try {
+      const tx = await this.program.methods
+        .initProcessBetCompDef()
+        .accounts({
+          payer: this.authority.publicKey,
+          mxeAccount: new PublicKey('BbBKMceJ5rfjdegkzbbRv6J9ujhPuAH2upidajtxjuKR'), // Replace with actual MXE account
+          compDefAccount: this.getCompDefPDA(0)[0], // offset 0 for process_bet
+          arciumProgram: new PublicKey('BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6'),
+          systemProgram: SystemProgram.programId,
+        })
+        .signers([this.authority])
+        .rpc();
+
+      console.log('Process bet comp def initialized:', tx);
+      return tx;
+    } catch (error: any) {
+      console.error('Failed to initialize process bet comp def:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Initialize calculate_reward computation definition (one-time setup)
+   */
+  async initCalculateRewardCompDef(): Promise<string> {
+    try {
+      const tx = await this.program.methods
+        .initCalculateRewardCompDef()
+        .accounts({
+          payer: this.authority.publicKey,
+          mxeAccount: new PublicKey('BbBKMceJ5rfjdegkzbbRv6J9ujhPuAH2upidajtxjuKR'), 
+          compDefAccount: this.getCompDefPDA(1)[0], 
+          arciumProgram: new PublicKey('BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6'),
+          systemProgram: SystemProgram.programId,
+        })
+        .signers([this.authority])
+        .rpc();
+
+      console.log('Calculate reward comp def initialized:', tx);
+      return tx;
+    } catch (error: any) {
+      console.error('Failed to initialize calculate reward comp def:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Derive computation definition PDA
+   */
+  private getCompDefPDA(offset: number): [PublicKey, number] {
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from('comp_def_account'), new BN(offset).toArrayLike(Buffer, 'le', 4)],
+      this.program.programId
+    );
   }
 
   /**

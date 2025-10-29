@@ -52,4 +52,95 @@ export class ProtocolController {
       next(error);
     }
   }
+
+  /**
+   * Initialize Arcium computation definitions (one-time setup)
+   */
+  static async initializeArciumCompDefs(req: Request, res: Response, next: NextFunction) {
+    try {
+      const results = {
+        processBet: null as string | null,
+        calculateReward: null as string | null,
+        errors: [] as string[],
+      };
+
+      // Initialize process_bet comp def
+      try {
+        const processBetTx = await cyphercastClient.initProcessBetCompDef();
+        results.processBet = processBetTx;
+      } catch (error: any) {
+        console.error('Process bet comp def initialization failed:', error.message);
+        results.errors.push(`Process bet: ${error.message}`);
+      }
+
+      // Initialize calculate_reward comp def
+      try {
+        const calculateRewardTx = await cyphercastClient.initCalculateRewardCompDef();
+        results.calculateReward = calculateRewardTx;
+      } catch (error: any) {
+        console.error('Calculate reward comp def initialization failed:', error.message);
+        results.errors.push(`Calculate reward: ${error.message}`);
+      }
+
+      if (results.errors.length === 2) {
+        throw new AppError(
+          'Failed to initialize both computation definitions',
+          500
+        );
+      }
+
+      return successResponse(
+        res,
+        results.errors.length === 0 
+          ? 'Arcium computation definitions initialized successfully'
+          : 'Arcium computation definitions partially initialized',
+        results,
+        201
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Initialize process_bet computation definition only
+   */
+  static async initProcessBetCompDef(req: Request, res: Response, next: NextFunction) {
+    try {
+      const signature = await cyphercastClient.initProcessBetCompDef();
+
+      return successResponse(
+        res,
+        'Process bet computation definition initialized',
+        { signature },
+        201
+      );
+    } catch (error: any) {
+      if (error.message.includes('already in use')) {
+        throw new AppError('Process bet comp def already initialized', 400);
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * Initialize calculate_reward computation definition only
+   */
+  static async initCalculateRewardCompDef(req: Request, res: Response, next: NextFunction) {
+    try {
+      const signature = await cyphercastClient.initCalculateRewardCompDef();
+
+      return successResponse(
+        res,
+        'Calculate reward computation definition initialized',
+        { signature },
+        201
+      );
+    } catch (error: any) {
+      if (error.message.includes('already in use')) {
+        throw new AppError('Calculate reward comp def already initialized', 400);
+      }
+      next(error);
+    }
+  }
 }
