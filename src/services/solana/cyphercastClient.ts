@@ -9,8 +9,6 @@ import type { SwivPrivacy } from './idl/swiv_privacy';
 import IDL from './idl/swiv_privacy.json';
 import { getArciumAccountBaseSeed, getArciumProgAddress, getCompDefAccOffset, getMXEAccAddress } from '@arcium-hq/client';
 
-const ARCIUM_PROGRAM_ID = new PublicKey('BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6');
-
 export class CypherCastClient {
   private program: Program<SwivPrivacy>;
   private provider: AnchorProvider;
@@ -20,15 +18,6 @@ export class CypherCastClient {
     this.provider = getProvider();
     this.program = new Program(IDL as SwivPrivacy, this.provider);
     this.authority = loadKeypair();
-  }
-
-  private deriveMxePDA(): PublicKey {
-    const [mxePda] = PublicKey.findProgramAddressSync(
-      [Buffer.from('mxe_pda')],
-      ARCIUM_PROGRAM_ID
-    );
-    console.log('Derived MXE PDA:', mxePda.toBase58());
-    return mxePda;
   }
 
   private getProtocolStatePDA(): [PublicKey, number] {
