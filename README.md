@@ -1,8 +1,8 @@
-# 🔮 CypherCast Backend
+# CypherCast Backend
 
 Production-ready backend API for CypherCast - A decentralized prediction platform on Solana.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -17,7 +17,7 @@ Production-ready backend API for CypherCast - A decentralized prediction platfor
 - [Testing](#testing)
 - [Deployment](#deployment)
 
-## ✨ Features
+## Features
 
 - **User Management**: Wallet-based registration and profile management
 - **Pool Creation**: Create prediction pools with custom parameters
@@ -30,7 +30,7 @@ Production-ready backend API for CypherCast - A decentralized prediction platfor
 - **Type Safety**: Full TypeScript implementation
 - **Error Handling**: Comprehensive validation and error responses
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Runtime**: Node.js (v18+)
 - **Framework**: Express.js with TypeScript
@@ -41,7 +41,7 @@ Production-ready backend API for CypherCast - A decentralized prediction platfor
 - **Oracle APIs**: Binance & CoinGecko
 - **HTTP Client**: Axios
 
-## 📦 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have:
 
@@ -51,7 +51,7 @@ Before you begin, ensure you have:
 - Solana CLI tools (optional, for keypair generation)
 - Access to Solana RPC (Devnet/Mainnet)
 
-## 🚀 Installation
+## Installation
 
 1. **Clone the repository**
 
@@ -72,7 +72,7 @@ npm install
 solana-keygen new --outfile ./keypair.json
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 1. **Create `.env` file**
 
@@ -119,7 +119,7 @@ CORS_ORIGIN=http://localhost:3000
 | `BINANCE_API_KEY` | Optional for higher rate limits | No |
 | `CORS_ORIGIN` | Frontend URL for CORS | Yes |
 
-## 🗄 Database Setup
+## Database Setup
 
 1. **Go to your Supabase project**
 
@@ -147,7 +147,7 @@ FROM information_schema.tables
 WHERE table_schema = 'public';
 ```
 
-## 🏃 Running the Server
+## Running the Server
 
 ### Development Mode
 
@@ -188,7 +188,7 @@ Expected response:
 }
 ```
 
-## 📚 API Documentation
+## API Documentation
 
 ### Base URL
 ```
@@ -219,7 +219,7 @@ All responses follow this structure:
 
 ---
 
-### 👤 Users Endpoints
+### Users Endpoints
 
 #### Register User
 ```http
@@ -241,7 +241,7 @@ GET /api/users/:walletAddress
 
 ---
 
-### 🏊 Pools Endpoints
+### Pools Endpoints
 
 #### Get All Pools
 ```http
@@ -290,7 +290,7 @@ POST /api/pools/:id/finalize
 
 ---
 
-### 📈 Predictions Endpoints
+### Predictions Endpoints
 
 #### Place Prediction
 ```http
@@ -327,7 +327,7 @@ POST /api/predictions/:id/claim
 
 ---
 
-### 🏆 Leaderboard Endpoints
+### Leaderboard Endpoints
 
 #### Get Leaderboard
 ```http
@@ -344,7 +344,7 @@ GET /api/leaderboard/:walletAddress
 
 ---
 
-### 📊 Statistics Endpoints
+### Statistics Endpoints
 
 #### Get Platform Stats
 ```http
@@ -389,7 +389,7 @@ GET /api/stats/assets
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 /cyphercast-backend
@@ -438,7 +438,7 @@ GET /api/stats/assets
 └── schema.sql                  # Database schema
 ```
 
-## ⏰ Cron Jobs
+## Cron Jobs
 
 ### Pool Finalization Job
 
@@ -462,7 +462,7 @@ cron.schedule('* * * * *', async () => { ... });
 // 0 0 * * * = every day at midnight
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Manual Testing
 
@@ -495,7 +495,7 @@ For production, consider adding:
 - Supertest for API testing
 - Test database for isolated testing
 
-## 🚀 Deployment
+## Deployment
 
 ### Deploying to Railway/Render/Heroku
 
@@ -568,7 +568,7 @@ docker run -p 5000:5000 --env-file .env cyphercast-backend
    - Implement queue system for blockchain transactions
    - Consider horizontal scaling
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -598,25 +598,3 @@ Failed to fetch price from Binance
 Pool finalization job not triggering
 ```
 **Solution**: Verify cron service started in `index.ts` and check server logs.
-
-## 📄 License
-
-MIT License - See LICENSE file for details
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
-## 📞 Support
-
-- **Documentation**: [Link to docs]
-- **Issues**: [GitHub Issues]
-- **Discord**: [Community server]
-
----
-
-Built with ❤️ for the Solana ecosystem
