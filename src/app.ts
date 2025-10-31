@@ -15,7 +15,7 @@ import protocolRoutes from './routes/protocol.routes';
 const app: Application = express();
 
 // Middleware
-app.use(cors({ origin: env.CORS_ORIGIN }));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
