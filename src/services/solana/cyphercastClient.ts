@@ -299,7 +299,7 @@ export class CypherCastClient {
         [baseSeedCompDefAcc, this.program.programId.toBuffer(), offset],
         getArciumProgAddress()
       )[0];
-      console.log("getMXEAccAddress:", getMXEAccAddress(this.program.programId));
+      console.log("getMXEAccAddress:", getMXEAccAddress(this.program.programId).toBase58());
 
       console.log(
         "Init process bet computation definition pda is ",
