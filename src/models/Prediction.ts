@@ -4,8 +4,6 @@ export interface Prediction {
   id: string;
   pool_id: string;
   user_wallet: string;
-  predicted_price: number;
-  direction: 'up' | 'down';
   amount: number;
   reward?: number;
   status: 'pending' | 'won' | 'lost' | 'claimed';
@@ -16,8 +14,6 @@ export class PredictionModel {
   static async create(predictionData: {
     pool_id: string;
     user_wallet: string;
-    predicted_price: number;
-    // direction: 'up' | 'down';
     amount: number;
   }): Promise<Prediction> {
     const { data, error } = await supabase

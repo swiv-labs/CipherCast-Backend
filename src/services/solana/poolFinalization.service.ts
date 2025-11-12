@@ -61,8 +61,6 @@ export class PoolFinalizationService {
     
     for (const prediction of predictions) {
       const isWinner = this.checkWinner(
-        prediction.direction,
-        prediction.predicted_price,
         finalPrice,
         targetPrice
       );
@@ -79,15 +77,9 @@ export class PoolFinalizationService {
    * Determine if prediction is a winner
    */
   private static checkWinner(
-    direction: 'up' | 'down',
-    predictedPrice: number,
     finalPrice: number,
     targetPrice: number
   ): boolean {
-    if (direction === 'up') {
-      return finalPrice >= targetPrice;
-    } else {
-      return finalPrice < targetPrice;
-    }
+    return finalPrice < targetPrice;
   }
 }

@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { PredictionModel } from '../models/Prediction';
 import { PoolModel } from '../models/Pool';
-import { cyphercastClient } from '../services/solana/cyphercastClient';
-import { PublicKey } from '@solana/web3.js';
 import { successResponse } from '../utils/response';
 import { AppError } from '../utils/errorHandler';
 
@@ -12,7 +10,7 @@ export class PredictionsController {
    */
   static async createPrediction(req: Request, res: Response, next: NextFunction) {
     try {
-      const { poolId, userWallet, predictedPrice, direction, amount } = req.body;
+      const { poolId, userWallet, amount } = req.body;
 
       // Validate pool exists and is active
       const pool = await PoolModel.findById(poolId);
@@ -32,8 +30,6 @@ export class PredictionsController {
       const prediction = await PredictionModel.create({
         pool_id: poolId,
         user_wallet: userWallet,
-        predicted_price: predictedPrice,
-        // direction,
         amount,
       });
 
@@ -73,12 +69,12 @@ export class PredictionsController {
         throw new AppError('Unauthorized', 403);
       }
 
-      if (prediction.status !== 'won') {
-        throw new AppError('Prediction did not win', 400);
-      }
-
       if (prediction.status === 'claimed') {
         throw new AppError('Reward already claimed', 400);
+      }
+
+      if (prediction.status !== 'won') {
+        throw new AppError('Prediction did not win', 400);
       }
 
       // Update prediction status
