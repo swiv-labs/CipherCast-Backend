@@ -7,7 +7,8 @@ import * as nacl from 'tweetnacl';
 // Actual SwivPrivacy IDL from Arcium build
 import type { SwivPrivacy } from './idl/swiv_privacy';
 import IDL from './idl/swiv_privacy.json';
-import { getArciumAccountBaseSeed, getArciumProgAddress, getCompDefAccOffset, getMXEAccAddress } from '@arcium-hq/client';
+import { getArciumAccountBaseSeed, getArciumProgAddress, getClusterAccAddress, getCompDefAccAddress, getCompDefAccOffset, getComputationAccAddress, getExecutingPoolAccAddress, getMempoolAccAddress, getMXEAccAddress } from '@arcium-hq/client';
+import { randomBytes } from 'crypto';
 
 export class CypherCastClient {
   private program: Program<SwivPrivacy>;
@@ -240,6 +241,54 @@ export class CypherCastClient {
   }
 
   /**
+   * Finalize pool with oracle price
+   */
+  async claimRewards(params: {
+    poolId: number;
+    userWallet: string;
+  }): Promise<string> {
+    try {
+      console.log("[claimRewards] Claiming rewards for pool ID:", params.poolId);
+      const [pool] = this.getPoolPDA(params.poolId);
+      const [bet] = this.getBetPDA(
+        pool,
+        new PublicKey(params.userWallet)
+      );
+      console.log("[claimRewards] Derived PDAs - Pool:", pool.toBase58(), "Bet:", bet.toBase58());
+
+      const offset = new BN(randomBytes(8), "hex");
+      const tx = await this.program.methods
+        .calculateReward(offset)
+        .accountsPartial({
+          pool,
+          bet,
+          user: new PublicKey(params.userWallet),
+          systemProgram: SystemProgram.programId,
+          mxeAccount: getMXEAccAddress(this.program.programId),
+          mempoolAccount: getMempoolAccAddress(this.program.programId),
+          executingPool: getExecutingPoolAccAddress(this.program.programId),
+          computationAccount: getComputationAccAddress(
+            this.program.programId,
+            offset
+          ),
+          compDefAccount: getCompDefAccAddress(
+            this.program.programId,
+            Buffer.from(getCompDefAccOffset("calculate_reward")).readUInt32LE()
+          ),
+          clusterAccount: getClusterAccAddress(768109697)
+        })
+        .signers([this.authority])
+        .rpc();
+
+      console.log('Reward claimed on-chain:', tx);
+      return tx;
+    } catch (error: any) {
+      console.error('Failed to claim reward on-chain:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Close pool (emergency)
    */
   async closePool(poolId: number): Promise<string> {
@@ -370,37 +419,6 @@ export class CypherCastClient {
       [Buffer.from('comp_def'), new BN(offset).toArrayLike(Buffer, 'le', 4)],
       this.program.programId
     );
-  }
-
-  /**
-   * Helper: Encrypt prediction price (for client-side use)
-   * This is an example - in production, encryption happens client-side
-   */
-  encryptPrediction(predictedPrice: number, userSecretKey: Uint8Array): {
-    ciphertext: Uint8Array;
-    publicKey: Uint8Array;
-    nonce: bigint;
-  } {
-    const nonceBytes = nacl.randomBytes(24);
-    const nonce = BigInt('0x' + Buffer.from(nonceBytes).toString('hex'));
-
-    const priceBuffer = Buffer.alloc(8);
-    priceBuffer.writeBigUInt64LE(BigInt(predictedPrice));
-
-    const plaintext = new Uint8Array(32);
-    plaintext.set(priceBuffer);
-
-    const key = userSecretKey.slice(0, 32);
-    const encrypted = nacl.secretbox(plaintext, nonceBytes, key);
-
-    const paddedCiphertext = new Uint8Array(32);
-    paddedCiphertext.set(encrypted.slice(0, 32));
-
-    return {
-      ciphertext: paddedCiphertext,
-      publicKey: userSecretKey.slice(32, 64), // public key part
-      nonce,
-    };
   }
 }
 

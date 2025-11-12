@@ -3,6 +3,7 @@ import { PredictionModel } from '../models/Prediction';
 import { PoolModel } from '../models/Pool';
 import { successResponse } from '../utils/response';
 import { AppError } from '../utils/errorHandler';
+import { cyphercastClient } from '../services/solana/cyphercastClient';
 
 export class PredictionsController {
   /**
@@ -45,8 +46,22 @@ export class PredictionsController {
   static async getUserPredictions(req: Request, res: Response, next: NextFunction) {
     try {
       const { userWallet } = req.params;
+
+      // Get predictions
       const predictions = await PredictionModel.findByUser(userWallet);
-      return successResponse(res, 'Predictions retrieved successfully', predictions);
+
+      // Get stats
+      const stats = await PredictionModel.getUserStats(userWallet);
+
+      return successResponse(res, 'Predictions retrieved successfully', {
+        stats: {
+          activePredictions: stats.activePredictions,
+          totalStaked: stats.totalStaked,
+          totalRewards: stats.totalRewards,
+          avgAccuracy: stats.avgAccuracy,
+        },
+        predictions: predictions,
+      });
     } catch (error) {
       next(error);
     }
@@ -73,10 +88,22 @@ export class PredictionsController {
         throw new AppError('Reward already claimed', 400);
       }
 
-      if (prediction.status !== 'won') {
-        throw new AppError('Prediction did not win', 400);
+      // if (prediction.status !== 'won') {
+      //   throw new AppError('Prediction did not win', 400);
+      // }
+
+
+      const pool = await PoolModel.findById(prediction.pool_id);
+      if (!pool) {
+        throw new AppError('Pool not found', 404);
       }
 
+      const signature = await cyphercastClient.claimRewards({
+        poolId: pool.poolid,
+        userWallet: userWallet,
+      });
+
+      console.log(`Reward claimed on-chain for prediction ${id}:`, signature);
       // Update prediction status
       const updatedPrediction = await PredictionModel.update(id, {
         status: 'claimed',
