@@ -49,9 +49,9 @@ export class OracleService {
    */
   static async getCurrentPrice(assetSymbol: string): Promise<number> {
     try {
-      return await this.getPriceFromBinance(assetSymbol);
+      return await this.getPriceFromCoinGecko(assetSymbol);
     } catch (error) {
-      console.log('Binance failed, trying CoinGecko...');
+      console.log('Trying CoinGecko again...');
       return await this.getPriceFromCoinGecko(assetSymbol);
     }
   }
